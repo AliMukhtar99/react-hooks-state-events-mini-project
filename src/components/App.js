@@ -2,42 +2,39 @@ import React, { useState } from "react";
 import CategoryFilter from "./CategoryFilter";
 import NewTaskForm from "./NewTaskForm";
 import TaskList from "./TaskList";
-import { CATEGORIES, TASKS } from "../data";
 
+import { CATEGORIES, TASKS } from "../data";
 console.log("Here's the data you're working with");
 console.log({ CATEGORIES, TASKS });
 
 function App() {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [newTask, setNewTask] = useState({ text: "", category: "code" });
-  const [newTaskList, setNewTaskList] = useState([...TASKS]);
+  const [tasks, setTasks] = useState(TASKS);
+  const [category, setCategory] = useState("All");
 
-  function onInputChange(event) {
-    setNewTask(() => {
-      return { ...newTask, [event.target.name]: event.target.value };
-    });
+  function updateTask(newTask) {
+    setTasks([...tasks, newTask]);
   }
+  // const updateTasks = (newTask) => {
+  //    setList([...list, newTask])
 
-  function onTaskFormSubmit(event) {
-    event.preventDefault();
-    setNewTaskList([...newTaskList, newTask]);
-    setNewTask({ ...newTask, text: "" });
+  // }
+  function deleteTask(deletedTaskText) {
+    setTasks(tasks.filter((task) => task.text !== deletedTaskText));
   }
+  const tasksToShow = tasks.filter(
+    (task) => category === "All" || task.category === category
+  );
 
   return (
     <div className="App">
       <h2>My tasks</h2>
       <CategoryFilter
-        setSelectedCategory={setSelectedCategory}
-        CATEGORIES={CATEGORIES}
+        categories={CATEGORIES}
+        selectedCategory={category}
+        onSelectCategory={setCategory}
       />
-      <NewTaskForm
-        CATEGORIES={CATEGORIES}
-        newTask={newTask}
-        onInputChange={onInputChange}
-        onTaskFormSubmit={onTaskFormSubmit}
-      />
-      <TaskList selectedCategory={selectedCategory} TASKS={newTaskList} />
+      <NewTaskForm onTaskFormSubmit={updateTask} categories={CATEGORIES} />
+      <TaskList tasks={tasksToShow} taskDelete={deleteTask} />
     </div>
   );
 }
